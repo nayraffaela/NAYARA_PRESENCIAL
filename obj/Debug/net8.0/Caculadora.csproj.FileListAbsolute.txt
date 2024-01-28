@@ -1,0 +1,14 @@
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\bin\Debug\net8.0\Caculadora.exe
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\bin\Debug\net8.0\Caculadora.deps.json
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\bin\Debug\net8.0\Caculadora.runtimeconfig.json
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\bin\Debug\net8.0\Caculadora.dll
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\bin\Debug\net8.0\Caculadora.pdb
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\Caculadora.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\Caculadora.AssemblyInfoInputs.cache
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\Caculadora.AssemblyInfo.cs
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\Caculadora.csproj.CoreCompileInputs.cache
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\Caculadora.dll
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\refint\Caculadora.dll
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\Caculadora.pdb
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\Caculadora.genruntimeconfig.cache
+C:\Users\NOTE\Desktop\nay\C# .Net\Caculadora\obj\Debug\net8.0\ref\Caculadora.dll
