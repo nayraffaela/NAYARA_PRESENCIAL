@@ -1,13 +1,13 @@
-﻿namespace Projeto_BancoConsole1
+﻿namespace Projeto_BancoConsole1.Models
 {
     public abstract class Conta
     {
-        public int ContaId { get;  set; }
+        public long Id { get; set; }
         public string Numero { get; protected set; }
         public decimal Saldo { get; protected set; }
         public TipoConta Tipo { get; protected set; }
 
-        public Conta()
+        public Conta() //contrutor
         {
             Saldo = 0;
         }

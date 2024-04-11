@@ -1,10 +1,28 @@
-﻿namespace Projeto_BancoConsole1
+﻿using Microsoft.Extensions.Configuration;
+using Projeto_BancoConsole1.Models;
+
+namespace Projeto_BancoConsole1
 {
     internal class Program
     {
+        private static ClienteRepository clienteRepository;
+        private static ContaRepository contaRepository;
+
         static void Main(string[] args)
         {
-            Cliente cliente = null;
+            IConfiguration configuration = new ConfigurationBuilder()
+           .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+           .Build();
+
+            // Obtém a string de conexão do arquivo de configuração
+            string connectionString = configuration.GetConnectionString("SafiraBankDatabase");
+
+            // Crie instâncias dos repositórios usando a string de conexão
+            clienteRepository = new ClienteRepository(connectionString);
+            contaRepository = new ContaRepository(connectionString);
+
+
+            Cliente cliente = null; //indicando que a variavel cliente ainda não foi incializada pois não há ainda cadastro de cliente.
 
             bool sair = false;
 
@@ -20,7 +38,7 @@
 
                 int opcao = int.Parse(Console.ReadLine());
 
-                if(opcao > 1 && opcao < 5 && !VerificaClienteConta(cliente))
+                if(opcao > 1 && opcao < 5 && !VerificaClienteConta(cliente)) //pra verficiar se o cliente já possui conta.
                 {
                     Console.WriteLine("Selecione a opção 1 para cadastrar uma conta antes de realizar uma operação.");
                 } 
@@ -29,27 +47,28 @@
                     switch (opcao)
                     {
                         case 1:
-                            cliente = CadastrarCliente();
-                            if (cliente == null)
+                            cliente = CadastrarCliente(); //chama o método
+                            if (cliente == null) //caso não tenha cadastro ainda, se não segue pa
+                                                 //ra sucesso.
                             {
                                 Console.WriteLine("É necessário cadastrar um cliente primeiro.");
                             }
                             else
                             {
-                                CadastrarNovaConta(cliente);
+                                CadastrarNovaConta(cliente); //chama método
                             }
                             break;
 
                         case 2:
-                            RealizarTransferencia(cliente);
+                            RealizarTransferencia(cliente);//chama o método
                             break;
 
                         case 3:
-                            RealizarDeposito(cliente);
+                            RealizarDeposito(cliente);//chama o método
                             break;
 
                         case 4:
-                            ConsultarSaldo(cliente);
+                            ConsultarSaldo(cliente);//chama o método
                             break;
 
                         case 5:
@@ -69,10 +88,10 @@
             }
         }
 
-        static Cliente CadastrarCliente()
+        static Cliente CadastrarCliente() //método
         {
             Console.WriteLine("CADASTRO DE NOVO CLIENTE");
-            Cliente cliente = new Cliente();
+            Cliente cliente = new Cliente(); //instancia
 
             Console.WriteLine("Informe o CPF do cliente (11 dígitos):");
             string cpf = Console.ReadLine();
@@ -81,29 +100,35 @@
                 Console.WriteLine("CPF inválido. Por favor, digite novamente:");
                 cpf = Console.ReadLine();
             }
-            cliente.CPF = cpf;
+            cliente.Cpf = cpf;
 
             Console.WriteLine("Informe o nome do cliente:");
             cliente.Nome = Console.ReadLine();
 
             Console.WriteLine("Informe a data de nascimento do cliente (dd/mm/aaaa):");
-            if (DateTime.TryParse(Console.ReadLine(), out DateTime dataNascimento))
+            if (DateTime.TryParse(Console.ReadLine(), out DateTime dataNascimento)) //o out usado para que o metodo tryparse modifique a variavel
             {
                 cliente.DataNascimento = dataNascimento;
             }
 
+            Console.WriteLine("Informe a senha do cliente:");
+            cliente.Senha = Console.ReadLine();
+
+            //salva no banco....
+            clienteRepository.AddCliente(cliente);
+
             return cliente;
         }
 
-        static void CadastrarNovaConta(Cliente cliente)
+        static void CadastrarNovaConta(Cliente cliente)//método
         {
             Console.WriteLine("CADASTRO DE NOVA CONTA");
 
             Console.WriteLine("Informe o tipo de conta (0 para Conta Corrente, 1 para Conta Poupança):");
-            int tipoContaInput = int.Parse(Console.ReadLine());
-            TipoConta tipoConta = (TipoConta)tipoContaInput;
+            int tipoContaInput = int.Parse(Console.ReadLine());//tentativa de conversão+ exceção;
+            TipoConta tipoConta = (TipoConta)tipoContaInput; //tentativa de conversão para enum
 
-            //instância da classe Conta com as informações que foram incluidas
+            //instância da classe Conta
             Conta novaConta;
             if (tipoConta == TipoConta.Corrente)
             {
@@ -116,12 +141,14 @@
 
             cliente.Conta = novaConta;
 
+            contaRepository.CriarConta(cliente);
+
             Console.WriteLine("Nova conta cadastrada com sucesso!");
         }
 
         
 
-        static void RealizarTransferencia(Cliente cliente)
+        static void RealizarTransferencia(Cliente cliente)//método
         {
             Console.WriteLine("TRANSFERÊNCIA");
             Console.WriteLine("Digite a quantia a ser transferida:");
@@ -162,14 +189,14 @@
         }
         static bool VerificaClienteConta(Cliente cliente)
         {
-            return cliente != null && cliente.Conta != null;
+            return cliente != null && cliente.Conta != null; //Verificação
         }
         static void ConsultarSaldo(Cliente cliente)
         {
             Console.WriteLine("CONSULTA DE SALDO");
             Console.WriteLine("Dados do cliente:");
             Console.WriteLine("Nome: " + cliente.Nome);
-            Console.WriteLine("CPF: " + cliente.CPF);
+            Console.WriteLine("CPF: " + cliente.Cpf);
             Console.WriteLine("Data de Nascimento: " + cliente.DataNascimento.ToString("dd/MM/yyyy"));
             Console.WriteLine("Tipo de cliente: " + cliente.Tipo);
 

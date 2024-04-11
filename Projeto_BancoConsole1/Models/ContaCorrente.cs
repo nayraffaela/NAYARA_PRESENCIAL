@@ -1,4 +1,4 @@
-﻿namespace Projeto_BancoConsole1
+﻿namespace Projeto_BancoConsole1.Models
 {
     public class ContaCorrente : Conta
     {
@@ -8,9 +8,21 @@
             Saldo = 0;
             Numero = Math.Round(new Random().NextDouble(), 8).ToString();
         }
+
+        public static ContaCorrente Create(long id, decimal saldo, string numero, decimal taxa)
+        {
+           var conta = new ContaCorrente();
+            conta.Id = id;
+            conta.Saldo = saldo;
+            conta.Numero = numero;
+            conta.taxaManutencao = taxa;
+
+            return conta;
+        }
+
         public decimal taxaManutencao { get; set; }
 
-        public override void Transferir(decimal quantia)
+        public override void Transferir(decimal quantia) //metd
         {
             if (quantia <= 0)
             {
@@ -22,7 +34,7 @@
                 throw new InvalidOperationException("Saldo insuficiente para realizar a transferência.");
             }
 
-            Saldo -= quantia;
+            Saldo -= quantia; //dedução
 
         }
         public override void Depositar(decimal quantia)
@@ -35,9 +47,9 @@
             Saldo += quantia;
 
         }
-        public decimal DescontarTaxa()
+        public decimal DescontarTaxa() //metd
         {
-            Saldo = Saldo - (Saldo * taxaManutencao);
+            Saldo = Saldo - Saldo * taxaManutencao;
             return Saldo;
         }
     }
