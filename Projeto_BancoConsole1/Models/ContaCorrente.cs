@@ -5,8 +5,7 @@
         public ContaCorrente()
         {
             Tipo = TipoConta.Corrente;
-            Saldo = 0;
-            Numero = Math.Round(new Random().NextDouble(), 8).ToString();
+            taxaManutencao = 0.5m;
         }
 
         public static ContaCorrente Create(long id, decimal saldo, string numero, decimal taxa)
@@ -34,8 +33,9 @@
                 throw new InvalidOperationException("Saldo insuficiente para realizar a transferência.");
             }
 
-            Saldo -= quantia; //dedução
 
+            DescontarTaxa(quantia); // Deduz a taxa de manutenção
+            Saldo -= quantia; 
         }
         public override void Depositar(decimal quantia)
         {
@@ -45,12 +45,28 @@
             }
 
             Saldo += quantia;
+         
 
         }
-        public decimal DescontarTaxa() //metd
+        private void DescontarTaxa(decimal quantiaTransferida) //metd
         {
-            Saldo = Saldo - Saldo * taxaManutencao;
-            return Saldo;
+            decimal taxaDesconto;
+            switch (Cliente.Tipo)
+            {
+                case TipoCliente.Comum:
+                    taxaDesconto = quantiaTransferida * ( taxaManutencao + 0.1m); // 10% de desconto para clientes comuns
+                    break;
+                case TipoCliente.Super:
+                    taxaDesconto = quantiaTransferida * (taxaManutencao + 0.05m); // 5% de desconto para clientes super
+                    break;
+                case TipoCliente.Premium:
+                    taxaDesconto = quantiaTransferida * (taxaManutencao + 0.02m); // 2% de desconto para clientes premium
+                    break;
+                default:
+                    taxaDesconto = 0; // Nenhum desconto padrão
+                    break;
+            }
+            Saldo -= taxaDesconto;
         }
     }
 }

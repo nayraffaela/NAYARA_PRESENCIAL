@@ -5,9 +5,9 @@
         public ContaPoupanca() //construtor
         {
             Tipo = TipoConta.Poupanca;
-            Saldo = 0;
-            Numero = Math.Round(new Random().NextDouble(), 8).ToString();//gera numero aleatório e o arredonda p/8 csas dec
+            taxaRendimento = 0.5m;
         }
+
         public decimal taxaRendimento { get; set; }
 
         public override void Transferir(decimal quantia) //metdo
@@ -34,7 +34,6 @@
             }
 
             Saldo += quantia; //add quantia
-
         }
 
 

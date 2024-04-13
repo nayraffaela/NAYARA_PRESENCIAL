@@ -5,18 +5,16 @@ public class ContaRepository
 {
     private readonly string connectionString;
 
-    public ContaRepository(string connectionString)
+    public ContaRepository(string connectionString)//contrutor string
     {
         this.connectionString = connectionString;
     }
 
-    public void CriarConta(Cliente cliente)
+    public void CriarConta(Conta conta)//metodo p/nova conta no BD
     {
-        var conta = cliente.Conta;
-
-        using (var connection = new SqlConnection(connectionString))
+        using (var connection = new SqlConnection(connectionString)) //abrir conexão com BD
         {
-            connection.Open();
+            connection.Open(); //comando SQL p/ input de dados em CONTA
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"INSERT INTO Conta (numero, saldo, tipo, taxa, clienteId)
@@ -26,7 +24,7 @@ public class ContaRepository
                 command.Parameters.AddWithValue("@saldo", conta.Saldo);
                 command.Parameters.AddWithValue("@tipo", conta.Tipo);
 
-                if(conta.Tipo == TipoConta.Poupanca)
+                if(conta.Tipo == TipoConta.Poupanca) //compara tipoconta p/add
                 {
                     command.Parameters.AddWithValue("@taxa", ((ContaPoupanca)conta).taxaRendimento);
                 }else
@@ -34,32 +32,32 @@ public class ContaRepository
                     command.Parameters.AddWithValue("@taxa", ((ContaCorrente)conta).taxaManutencao);
                 }
 
-                command.Parameters.AddWithValue("@clienteId", cliente.Id);
+                command.Parameters.AddWithValue("@clienteId", conta.Cliente.Id);
 
-                long id = (long)command.ExecuteScalar();
+                long id = Convert.ToInt64(command.ExecuteScalar()); //execução do comando sql e retorna o ID conta criado
 
-                cliente.Id = id;
+                conta.Id = id; // atualização de ID da conta recente
             }
         }
     }
-    public Conta GetContaById(long id)
+    public Conta GetContaByNumero(string numero) //Método p/ conta do banco pelo id
     {
         Conta conta = null;
 
-        using (var connection = new SqlConnection(connectionString))
+        using (var connection = new SqlConnection(connectionString)) //conexão BD
         {
             connection.Open();
           
-            using (var command = connection.CreateCommand())
+            using (var command = connection.CreateCommand()) //comando sql p/selecionar dados com base ID
             {
-                command.CommandText = "SELECT * FROM Conta WHERE id = @id";
-                command.Parameters.AddWithValue("@id", id);
+                command.CommandText = "SELECT * FROM Conta WHERE numero = @numero";
+                command.Parameters.AddWithValue("@numero", numero);
 
-                using (var reader = command.ExecuteReader())
+                using (var reader = command.ExecuteReader()) //Executa o SQL e le os dados
                 {
                     if (reader.Read())
                     {
-                        conta = LerConta(id, reader);
+                        conta = LerConta(reader);
                     }
                 }
             }
@@ -67,36 +65,36 @@ public class ContaRepository
         return conta;
     }
 
-    private static Conta LerConta(long id, SqlDataReader reader)
+    public static Conta LerConta(SqlDataReader reader) //metd auxiliar que le os dados da conta no BD
     {
         Conta conta;
+        var id = (long)reader["id"];
         var tipoConta = reader["tipo"].ToString();
         var saldo = (decimal)reader["saldo"];
         var numero = reader["numero"].ToString();
         var taxa = (decimal)reader["taxa"];
 
-        if (tipoConta == TipoConta.Poupanca.ToString())
+        if (tipoConta == TipoConta.Poupanca.ToString("D"))
         {
-            conta = ContaCorrente.Create(id, saldo, numero, taxa);
+            conta = ContaPoupanca.Create(id, saldo, numero, taxa);
         }
         else
         {
-            conta = ContaPoupanca.Create(id, saldo, numero, taxa);
+            conta = ContaCorrente.Create(id, saldo, numero, taxa);
         }
 
         return conta;
     }
 
-    public void UpdateConta(Cliente cliente)
+    public void UpdateConta(Conta conta) //update de conta no BD
     {
-        var conta = cliente.Conta;
         using (var connection = new SqlConnection(connectionString))
         {
             connection.Open();
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"UPDATE Conta 
-                                        SET numero = @numero, saldo = @saldo, tipo = @tipo, taxa = @taxa, clienteId = @clienteId
+                                        SET numero = @numero, saldo = @saldo, tipo = @tipo, taxa = @taxa
                                         WHERE id = @id";
                 command.Parameters.AddWithValue("@numero", conta.Numero);
                 command.Parameters.AddWithValue("@saldo", conta.Saldo);
@@ -111,7 +109,6 @@ public class ContaRepository
                     command.Parameters.AddWithValue("@taxa", ((ContaCorrente)conta).taxaManutencao);
                 }
 
-                command.Parameters.AddWithValue("@clienteId", cliente.Id);
                 command.Parameters.AddWithValue("@id", conta.Id);
 
                 command.ExecuteNonQuery();
@@ -119,7 +116,7 @@ public class ContaRepository
         }
     }
 
-    public void DeleteConta(long id)
+    public void DeleteConta(long id) //mtd exclusão de conta do BD pelo ID
     {
         using (var connection = new SqlConnection(connectionString))
         {
@@ -129,28 +126,28 @@ public class ContaRepository
                 command.CommandText = "DELETE FROM Conta WHERE id = @id";
                 command.Parameters.AddWithValue("@id", id);
 
-                command.ExecuteNonQuery();
+                command.ExecuteNonQuery(); //execução do comando
             }
         }
     }
 
-    public List<Conta> GetAllContas()
+    public List<Conta> GetAllContas() //mtd para ter todas as contas do BD
     {
         List<Conta> contas = new List<Conta>();
 
         using (var connection = new SqlConnection(connectionString))
         {
             connection.Open();
-            using (var command = connection.CreateCommand())
+            using (var command = connection.CreateCommand()) //criar o comando SQL para selecionar all contas da tbela "COnta"
             {
                 command.CommandText = "SELECT * FROM Conta";
 
-                using (var reader = command.ExecuteReader())
+                using (var reader = command.ExecuteReader()) //Executa o comando e lê dados all cntas
                 {
                     var id = (long)reader["saldo"];
-                    while (reader.Read())
+                    while (reader.Read()) //enqnto tiver dados a serem lidos, criar objetos conta correspondente
                     {
-                        contas.Add(LerConta(id, reader));
+                        contas.Add(LerConta(reader));
                     }
                 }
             }
